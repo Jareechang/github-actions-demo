@@ -1,0 +1,27 @@
+name: get-output 
+
+on:
+  push:
+    branches:
+      - 'f-**' 
+      - 'feature-**' 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: First Step 
+        uses: actions/setup-node@v2
+      - run: |
+          echo '::set-output name=BUILD_PARAM::build-param-123'
+        id: first-step
+
+      - name: Second Step 
+        uses: actions/setup-node@v2
+      - run: yarn get-output
+        env:
+          BUILD_PARAM: ${{ steps.first-step.outputs.BUILD_PARAM }}

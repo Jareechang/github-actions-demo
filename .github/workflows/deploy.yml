@@ -1,0 +1,43 @@
+name: deploy 
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+    paths:
+      - 'src/**'
+
+jobs:
+  deploy:
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Install, Test and Build
+        uses: actions/checkout@v2
+      - run: |
+          yarn install --frozen-lockfile --production
+          yarn test --watchAll=false 
+          yarn build
+        env:
+          PUBLIC_URL: /app/
+
+      - name: Sync to S3
+        uses: chrislennon/action-aws-cli@v1.1
+      - run: aws s3 sync build s3://${{ secrets.AWS_S3_BUCKET_NAME }}/app
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Invalidate CloudFront Cache
+        uses: chrislennon/action-aws-cli@v1.1
+      - run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CF_DISTRIBUTION_ID }} --paths "/app/index.html"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
