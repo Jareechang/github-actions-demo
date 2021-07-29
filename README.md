@@ -1,5 +1,6 @@
 # Github actions demo (test)
 
+![Github actions diagram](./images/github-actions-diagram.svg "Title")
 
 Demo of a few of the capabilities of github actions.
 
