@@ -1,4 +1,4 @@
-# Github actions demo (test)
+# Github actions demo
 
 ![Github actions diagram](./images/github-actions-diagram.svg "Title")
 
